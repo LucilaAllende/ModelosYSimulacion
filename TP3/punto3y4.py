@@ -4,11 +4,12 @@ import math
 
 def calcular_intervalo_confianza(coficienteZ, media, error):
     margenError = coficienteZ * error
-    return media + margenError, media - margenError
+    return media - margenError, media + margenError
 
-# Punto 3.c genero 100 datos con una distribucion de probabilidad exponencial.
+'''# Punto 3.c genero 100 datos con una distribucion de probabilidad exponencial.
 beta = 1/2 #beta
 datos_exponencial_1 = np.random.exponential(scale=beta, size=100) #creando muestra de datos
+
 # grafico histograma de distribución exponencial.
 sns_plot = sns.distplot(datos_exponencial_1)
 fig = sns_plot.get_figure()
@@ -18,7 +19,7 @@ fig.savefig("distribucionExponencial100.png")
 n = len(datos_exponencial_1)
 media = np.mean(datos_exponencial_1)
 varianza = np.var(datos_exponencial_1)
-desvio = 3
+desvio = np.std(datos_exponencial_1)*3
 error = (desvio/(math.sqrt(n)))
 coficienteZ = 2.575
 
@@ -29,20 +30,21 @@ print("La media de 100 valores",media)
 print("La varianza de 100 valores", varianza)
 print(cadena100)
 
-
+'''
 # Punto 3.d genero 1000 datos con una distribucion de probabilidad exponencial.
 beta = 1/2 #beta
 datos_exponencial_2 = np.random.exponential(scale=beta, size=1000) #creando muestra de datos
-# grafico histograma de distribución exponencial.
+
+'''# grafico histograma de distribución exponencial.
 sns_plot = sns.distplot(datos_exponencial_2)
 fig = sns_plot.get_figure()
-fig.savefig("distribucionExponencial1000.png")
+fig.savefig("distribucionExponencial1000.png")'''
 
 #Punto 4 calculo la media, la varianza y el intervalo de confianza para el punto 3.d
 n = len(datos_exponencial_2)
 media = np.mean(datos_exponencial_2)
 varianza = np.var(datos_exponencial_2)
-desvio = 3
+desvio = np.std(datos_exponencial_2)*3
 error = (desvio/(math.sqrt(n)))
 coficienteZ = 2.575
 
@@ -53,7 +55,7 @@ print("La media de 1000 valores",media)
 print("La varianza de 1000 valores", varianza)
 print(cadena1000)
 
-#Punto 3.a transformo de uniforme a exponencial
+'''#Punto 3.a transformo de uniforme a exponencial
 def transformacion(dato, lambd):
     return (np.log(dato)*-1)/lambd
 
@@ -66,6 +68,6 @@ datos_transformados = list(map(lambda i: transformacion(i,lambdaE), datos_unifor
 # grafico histograma de distribución exponencial.
 sns_plot = sns.distplot(datos_transformados)
 fig = sns_plot.get_figure()
-fig.savefig("distribucionTransformacion.png")
+fig.savefig("distribucionTransformacion.png")'''
 
 
