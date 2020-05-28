@@ -85,9 +85,9 @@ print(f"El porcentaje de criticidad que tiene el acceso superior es {porcentanje
 print(f"El porcentaje de criticidad que tiene el acceso medio es {porcentanje_am}% ")
 print(f"El porcentaje de criticidad que tiene el acceso inferior es {porcentanje_ai}% ")
 
-""" sns_plot = sns.distplot(duraciones_proyectos)
+sns_plot = sns.distplot(duraciones_proyectos)
 fig = sns_plot.get_figure()
-fig.savefig("distribucion3000Corridas.png") """
+fig.savefig("distribucion3000Corridas.png")
 
 sns_plot = sns.distplot(promedio_total_experimentos)
 fig = sns_plot.get_figure()
