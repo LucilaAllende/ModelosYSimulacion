@@ -54,7 +54,7 @@ def tomar_proximo_evento(fel):
     else:
         return None
 
-
+#Esta funcion no va mas
 def inicializacion():
     #genero tiempos de atencion
     atencion_empleado1 = np.random.normal(18,4,1)
@@ -74,7 +74,6 @@ CANTIDAD_MINUTOS_LABORABLES = (CANTIDAD_HORAS_LABORABLES*60) #24 hs * 60 minutos
 CANTIDAD_EMPLEADOS=4
 CANTIDAD_SURTIDORES=4
 
-CAMIONES_POR_HORA=15
 
 #eventos
 LLEGADA_CAMION = 1

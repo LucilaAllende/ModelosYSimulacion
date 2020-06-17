@@ -15,4 +15,4 @@ class EstacionDeServicio:
         for i in range(cantidad_surtidores):
             self.surtidores.append(Surtidor(horas_simulacion))
 
-        self.cantidad_vehiculos_atendidos=0
+        self.cantidad_camiones_atendidos=0
