@@ -1,18 +1,59 @@
 import numpy as np
 import seaborn as sns
 import math
+from random import randint
 
 from Empleado import Empleado
 from Surtidor import Surtidor
 from EstacionDeServicio import EstacionDeServicio
 from Reloj import Reloj
+from Evento import Evento
+
+def llegada_camiones():
+    cantidad = randint(3,5)
+    llegada = np.random.exponential(1/15, cantidad)
+    #print (llegada)
+    return llegada
+
+def generar_eventos_llegada():
+    eventos = []
+    for i in llegada_camiones():
+        evento = Evento(LLEGADA_CAMION, i)
+        eventos.append(evento)
+    return eventos
 
 def generar_FEL(horas_simulacion):
     fel = []
-    for hora in range(horas_simulacion):
-        camiones= np.random.exponential(1/CAMIONES_POR_HORA)
-        print(camiones)
+    for i in range(horas_simulacion):
+        eventos_llegada = generar_eventos_llegada()
+        fel+=eventos_llegada
+    print(len(fel))
+    for evento in fel:
+        print(evento)
+    
+    sorted(fel)
+    #sorted(fel, key=lambda evento: evento.inicio)
+    
+    print("Ordenado")
+    for evento in fel:
+        print(evento)
+
+    evento1 = fel[0]
+    evento2 = fel[1]
+    print("e1")
+    print(evento1)
+    print("e2")
+    print(evento2)
     return fel
+
+def tomar_proximo_evento(fel):
+    if (len(fel) > 0):
+        proximo_evento = fel[0]
+        fel.remove(proximo_evento)
+        return proximo_evento
+    else:
+        return None
+
 
 def inicializacion():
     #genero tiempos de atencion
@@ -28,23 +69,27 @@ def inicializacion():
 MAX_EXPERIMENTOS=60
 MAX_CORRIDAS=100
 
-CANTIDAD_HORAS=24
-CANTIDAD_MINUTOS_HORA = (24*60) #24 hs * 60 minutos laborables
+CANTIDAD_HORAS_LABORABLES=24
+CANTIDAD_MINUTOS_LABORABLES = (CANTIDAD_HORAS_LABORABLES*60) #24 hs * 60 minutos laborables
 CANTIDAD_EMPLEADOS=4
 CANTIDAD_SURTIDORES=4
 
 CAMIONES_POR_HORA=15
+
+#eventos
+LLEGADA_CAMION = 1
+ATENCION_CAMION = 2
+FIN_ATENCION_CAMION = 3
+SALIDA_CAMION = 4
 
 
 #variables
 duraciones_atenciones = []
 promedio_total_experimentos = []
 
-
-horas_transcurridas = 0
 reloj_simulacion = Reloj()
-estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS,CANTIDAD_EMPLEADOS,CANTIDAD_SURTIDORES)
-FEL=generar_FEL(CANTIDAD_HORAS)
+estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS_LABORABLES,CANTIDAD_EMPLEADOS,CANTIDAD_SURTIDORES)
+FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
 
 for experimento in range(MAX_EXPERIMENTOS):
     duracion_experimento = 0
