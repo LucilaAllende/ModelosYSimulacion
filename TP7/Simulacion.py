@@ -54,6 +54,14 @@ def tomar_proximo_evento(fel):
     else:
         return None
 
+def procesar_evento(evento, reloj_simulacion, estacion, fel):
+
+    if evento.tipo == LLEGADA_CAMION :
+        if verificar_surtidores():
+            surtidor = surtidor_libre()
+    else:
+        break
+
 #Esta funcion no va mas
 def inicializacion():
     #genero tiempos de atencion
@@ -93,8 +101,15 @@ FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
 for experimento in range(MAX_EXPERIMENTOS):
     duracion_experimento = 0
     for corrida in range(MAX_CORRIDAS):
-       
-        inicializacion()
+
+        evento_actual = tomar_proximo_evento(FEL)
+
+        if evento_actual:
+            #avanzo el reloj al tiempo del evento actual
+            reloj_simulacion.avanzar(evento_actual.inicio)
+
+            #procesar el evento actual
+            procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL)
         
         duracion_atencion = 0
        
