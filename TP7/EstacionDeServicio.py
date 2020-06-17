@@ -16,3 +16,11 @@ class EstacionDeServicio:
             self.surtidores.append(Surtidor(horas_simulacion))
 
         self.cantidad_camiones_atendidos=0
+
+    def verificar_surtidores_libres(self):
+        libres = []
+        for surtidor in self.surtidores:
+            estado = surtidor.estoy_libre()
+            if estado == True:
+               libres+=surtidor
+        return libres

@@ -7,3 +7,5 @@ class Surtidor:
         self.disponible = True
         self.horas = horas
 
+    def estoy_libre(self):
+        return self.disponible

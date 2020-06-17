@@ -54,13 +54,15 @@ def tomar_proximo_evento(fel):
     else:
         return None
 
+
 def procesar_evento(evento, reloj_simulacion, estacion, fel):
 
     if evento.tipo == LLEGADA_CAMION :
-        if verificar_surtidores():
-            surtidor = surtidor_libre()
+        surtidores = estacion.verificar_surtidores_libres()
+        if len(surtidores):
+
     else:
-        break
+        return None
 
 #Esta funcion no va mas
 def inicializacion():
