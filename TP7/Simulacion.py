@@ -2,48 +2,45 @@ import numpy as np
 import seaborn as sns
 import math
 from random import randint
+import bisect
 
-from Empleado import Empleado
 from Surtidor import Surtidor
 from EstacionDeServicio import EstacionDeServicio
 from Reloj import Reloj
 from Evento import Evento
+from Camion import Camion
 
 def llegada_camiones():
     cantidad = randint(3,5)
-    llegada = np.random.exponential(1/15, cantidad)
+    llegada = np.random.exponential(15, cantidad)
     #print (llegada)
     return llegada
 
 def generar_eventos_llegada():
     eventos = []
     for i in llegada_camiones():
-        evento = Evento(LLEGADA_CAMION, i)
+        evento = Evento(LLEGADA_CAMION, i, None)
         eventos.append(evento)
     return eventos
+
+def fin_atencion(fel, nuevo_evento):
+    bisect.insort(fel, nuevo_evento)
+
+def generar_evento_fin_atencion(fel, inicio_evento):
+    evento = Evento(FIN_ATENCION_CAMION,inicio_evento, None)
+    fin_atencion(fel, evento)
 
 def generar_FEL(horas_simulacion):
     fel = []
     for i in range(horas_simulacion):
         eventos_llegada = generar_eventos_llegada()
         fel+=eventos_llegada
-    print(len(fel))
-    for evento in fel:
-        print(evento)
     
-    sorted(fel)
+    fel= sorted(fel)
     #sorted(fel, key=lambda evento: evento.inicio)
-    
-    print("Ordenado")
-    for evento in fel:
-        print(evento)
-
-    evento1 = fel[0]
-    evento2 = fel[1]
-    print("e1")
-    print(evento1)
-    print("e2")
-    print(evento2)
+    print(len(fel))
+    #for evento in fel:
+        #print(evento)
     return fel
 
 def tomar_proximo_evento(fel):
@@ -57,22 +54,29 @@ def tomar_proximo_evento(fel):
 
 def procesar_evento(evento, reloj_simulacion, estacion, fel):
 
+    cola = 0
+
     if evento.tipo == LLEGADA_CAMION :
-        surtidores = estacion.verificar_surtidores_libres()
-        if len(surtidores):
+        camion = Camion(reloj_simulacion, 0)
+        surtidores_libres = estacion.verificar_surtidores_libres()
+        if len(surtidores_libres):
+            surtidor = surtidores_libres[0] 
+            tiempo_atencion_surtidor = surtidor.tiempo_atencion()
+            evento.asignar_surtidor(surtidor)
+            surtidor.disponible=False
+            #print(tiempo_atencion_surtidor)
+            generar_evento_fin_atencion(fel, reloj_simulacion + tiempo_atencion_surtidor)
+        else:
+            cola+=1
+            break
 
-    else:
-        return None
-
-#Esta funcion no va mas
-def inicializacion():
-    #genero tiempos de atencion
-    atencion_empleado1 = np.random.normal(18,4,1)
-    atencion_empleado2 = np.random.exponential(scale=1/15,size=1)
-    atencion_empleado3 = np.random.exponential(scale=1/16, size=1)
-    atencion_empleado4 = np.random.normal(18, 3, 1)
-
-    return atencion_empleado1, atencion_empleado2, atencion_empleado3, atencion_empleado4
+    elif evento.tipo == FIN_ATENCION_CAMION :
+        cola-=1
+        estacion.cantidad_camiones_atendidos+=1
+        surtidor = evento.get_surtidor()
+        surtidor.disponible=True
+    
+    return None 
 
 
 #constantes
@@ -81,7 +85,6 @@ MAX_CORRIDAS=100
 
 CANTIDAD_HORAS_LABORABLES=24
 CANTIDAD_MINUTOS_LABORABLES = (CANTIDAD_HORAS_LABORABLES*60) #24 hs * 60 minutos laborables
-CANTIDAD_EMPLEADOS=4
 CANTIDAD_SURTIDORES=4
 
 
@@ -93,11 +96,11 @@ SALIDA_CAMION = 4
 
 
 #variables
-duraciones_atenciones = []
 promedio_total_experimentos = []
+tiempo_promedio_espera = 0
 
 reloj_simulacion = Reloj()
-estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS_LABORABLES,CANTIDAD_EMPLEADOS,CANTIDAD_SURTIDORES)
+estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS_LABORABLES,CANTIDAD_SURTIDORES)
 FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
 
 for experimento in range(MAX_EXPERIMENTOS):
@@ -119,7 +122,7 @@ for experimento in range(MAX_EXPERIMENTOS):
         duracion_experimento += duracion_atencion
 
         #Agrego la duracion de la atencion actual a la lista de duraciones de todas las atenciones
-        duraciones_atenciones.append(duracion_atencion)
+        #duraciones_atenciones.append(duracion_atencion)
 
     promedio_total_experimentos.append(duracion_experimento/MAX_CORRIDAS)
 

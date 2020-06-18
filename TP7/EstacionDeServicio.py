@@ -1,19 +1,15 @@
-from Empleado import Empleado
 from Surtidor import Surtidor
 
 class EstacionDeServicio:
     """
     Clase que representa la Estacion De Servicio
     """
-    def __init__(self, horas_simulacion, cantidad_empleados, cantidad_surtidores):
-
-        self.empleados = []
-        for i in range(cantidad_empleados):
-            self.empleados.append(Empleado(horas_simulacion))
+    def __init__(self, horas_simulacion, cantidad_surtidores):
         
         self.surtidores = []
         for i in range(cantidad_surtidores):
-            self.surtidores.append(Surtidor(horas_simulacion))
+            print(i)
+            self.surtidores.append(Surtidor(horas_simulacion, i+1))
 
         self.cantidad_camiones_atendidos=0
 
@@ -22,5 +18,5 @@ class EstacionDeServicio:
         for surtidor in self.surtidores:
             estado = surtidor.estoy_libre()
             if estado == True:
-               libres+=surtidor
+               libres.append(surtidor)
         return libres
