@@ -25,10 +25,12 @@ def generar_eventos_llegada():
 
 def fin_atencion(fel, nuevo_evento):
     bisect.insort(fel, nuevo_evento)
+    return None
 
 def generar_evento_fin_atencion(fel, inicio_evento):
     evento = Evento(FIN_ATENCION_CAMION,inicio_evento, None)
     fin_atencion(fel, evento)
+    return None
 
 def generar_FEL(horas_simulacion):
     fel = []
@@ -54,27 +56,27 @@ def tomar_proximo_evento(fel):
 
 def procesar_evento(evento, reloj_simulacion, estacion, fel):
 
-    cola = 0
-
+    cola = []
     if evento.tipo == LLEGADA_CAMION :
-        camion = Camion(reloj_simulacion, 0)
+        camion = Camion(reloj_simulacion.valor, 0, 0)
         surtidores_libres = estacion.verificar_surtidores_libres()
         if len(surtidores_libres):
+            camion.set_tiempo_espera(reloj_simulacion.valor-camion.llegada)
             surtidor = surtidores_libres[0] 
             tiempo_atencion_surtidor = surtidor.tiempo_atencion()
             evento.asignar_surtidor(surtidor)
-            surtidor.disponible=False
+            surtidor.set_disponible(False)
             #print(tiempo_atencion_surtidor)
-            generar_evento_fin_atencion(fel, reloj_simulacion + tiempo_atencion_surtidor)
+            generar_evento_fin_atencion(fel, reloj_simulacion.valor + tiempo_atencion_surtidor)
         else:
-            cola+=1
-            break
+            #No se que hacer acá, tiene que esperar. Pero como represento esa espera?
+            cola.append(camion)
 
     elif evento.tipo == FIN_ATENCION_CAMION :
-        cola-=1
+        #disminuir la cola?
         estacion.cantidad_camiones_atendidos+=1
         surtidor = evento.get_surtidor()
-        surtidor.disponible=True
+        surtidor.set_disponible(True)
     
     return None 
 

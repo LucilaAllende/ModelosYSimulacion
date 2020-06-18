@@ -13,6 +13,9 @@ class Surtidor:
     def estoy_libre(self):
         return self.disponible
 
+    def set_disponible(self, valor):
+        self.disponible = valor
+
     #genero tiempos de atencion
     def tiempo_atencion(self):
         tiempo_atencion = 0
