@@ -130,6 +130,8 @@ for experimento in range(MAX_EXPERIMENTOS):
         FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
         reloj_simulacion = Reloj()
         indice_fel=0
+        for evento in FEL:
+            print(evento)
         while len(FEL)>0:
             evento_actual = FEL[indice_fel]
             cantidad_eventos = len(FEL)
@@ -139,11 +141,11 @@ for experimento in range(MAX_EXPERIMENTOS):
         
             #procesar el evento actual
             procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, cola_camiones)
-            
-            indice_fel+=1
 
-            if indice_fel>=len(FEL):
-                if indice_fel>0:
+
+            indice_fel+=1
+            if indice_fel<=len(FEL):
+                if len(FEL)>0:
                     print("SOY CERO OTRA VEZ!!")
                     indice_fel=0
                 else:
