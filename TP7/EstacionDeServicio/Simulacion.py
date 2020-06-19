@@ -61,6 +61,7 @@ def tomar_proximo_evento(fel, evento):
         return None
 
 def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
+    avanzar=0
     if evento.tipo == LLEGADA_CAMION :
         print("Soy llegada. Reloj:")
         print(reloj_simulacion.valor)
@@ -71,6 +72,7 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
             print("Ya fui procesado")
         else:
             camion = Camion(reloj_simulacion.valor, 0, 0)
+            print("CAMION CREADO")
 
         surtidores_libres = estacion.verificar_surtidores_libres()
         if len(surtidores_libres):
@@ -82,13 +84,16 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
             print("ATENCION SURTIDOR-----")
             print(tiempo_atencion_surtidor)
             remover_evento_fel(fel, evento)
+            avanzar=0
             generar_evento_fin_atencion(fel, reloj_simulacion.valor + tiempo_atencion_surtidor, surtidor, camion)
         else:
             print("NO hay s libres")
             cola.append(camion)
+            avanzar=1
 
     elif evento.tipo == FIN_ATENCION_CAMION :
         print("SOy fin. Reloj")
+        print(reloj_simulacion.valor)
         quitar_camion_cola(cola, evento.get_camion())
         estacion.cantidad_camiones_atendidos+=1
         surtidor = evento.get_surtidor()
@@ -96,7 +101,7 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
         remover_evento_fel(fel, evento)
         print("BOrre un evento")
     
-    return None 
+    return avanzar 
 
 #constantes
 MAX_EXPERIMENTOS=1
@@ -135,18 +140,22 @@ for experimento in range(MAX_EXPERIMENTOS):
         while len(FEL)>0:
             evento_actual = FEL[indice_fel]
             cantidad_eventos = len(FEL)
-
+            print(cantidad_eventos)
+            for evento in FEL:
+                print(evento)
             #avanzo el reloj al tiempo del evento actual
             reloj_simulacion.avanzar(evento_actual.inicio)
         
             #procesar el evento actual
-            procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, cola_camiones)
+            avanzar = procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, cola_camiones)
 
-            indice_fel+=1
-            if indice_fel<=len(FEL):
-                if len(FEL)>0:
-                    print("SOY CERO OTRA VEZ!!")
-                    indice_fel=0
+            if avanzar==0:
+                indice_fel=0
+            elif avanzar == 1:
+                indice_fel+=1
+            
+            if indice_fel>=len(FEL):
+                if len(FEL) > 0: 
+                    indice_fel = 0 
                 else:
-                    break
-
+                    break 
