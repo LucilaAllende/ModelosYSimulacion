@@ -62,7 +62,7 @@ def tomar_proximo_evento(fel, evento):
 
 def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
     if evento.tipo == LLEGADA_CAMION :
-        print("SOy llegada. Reloj")
+        print("Soy llegada. Reloj:")
         print(reloj_simulacion.valor)
 
         #si es un evento reprocesado
@@ -130,33 +130,21 @@ for experimento in range(MAX_EXPERIMENTOS):
         FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
         reloj_simulacion = Reloj()
         indice_fel=0
-        for evento in FEL:
-            print(evento)
         while len(FEL)>0:
             evento_actual = FEL[indice_fel]
+            cantidad_eventos = len(FEL)
+
             #avanzo el reloj al tiempo del evento actual
             reloj_simulacion.avanzar(evento_actual.inicio)
-            print("Reloj")
-            print(reloj_simulacion.valor)
-            print("Cantidad eventos")
-            print(len(FEL))
-            print("Procesar")
-            print(evento_actual)
-            print("Indice antes")
-            print(indice_fel)
-
         
             #procesar el evento actual
             procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, cola_camiones)
-
-            print("Indice despues procesar")
-            print(indice_fel)
+            
             indice_fel+=1
 
-            print("Indice despues incre")
-            print(indice_fel)
             if indice_fel>=len(FEL):
                 if indice_fel>0:
+                    print("SOY CERO OTRA VEZ!!")
                     indice_fel=0
                 else:
                     break

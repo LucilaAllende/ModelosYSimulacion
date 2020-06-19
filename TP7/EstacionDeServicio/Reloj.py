@@ -7,3 +7,7 @@ class Reloj:
 
     def avanzar(self, nuevo_valor):
         self.valor = nuevo_valor
+
+
+                    #cuando el indice sea mayor a la longitud de la lista, corto. 
+            # Y esto se cumple lo probe, anduvo 20 veces y de repente dejo de andar
