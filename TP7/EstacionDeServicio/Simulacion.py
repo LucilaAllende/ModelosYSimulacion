@@ -60,8 +60,17 @@ def tomar_proximo_evento(fel, evento):
     else:
         return None
 
+def incrementar_tiempo_espera(tiempo,cola):  
+    for camion in cola:
+        camion.set_tiempo_espera(tiempo-camion.get_tiempo_llegada())
+
 def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
     avanzar=0
+    if evento.get_camion():
+        camion_cola = evento.get_camion()
+        if not camion_cola in cola:
+            incrementar_tiempo_espera(reloj_simulacion.valor, cola)
+    
     if evento.tipo == LLEGADA_CAMION :
         print("Soy llegada. Reloj:")
         print(reloj_simulacion.valor)
@@ -72,17 +81,18 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
             print("Ya fui procesado")
         else:
             camion = Camion(reloj_simulacion.valor, 0, 0)
+            evento.asignar_camion(camion)
             print("CAMION CREADO")
 
         surtidores_libres = estacion.verificar_surtidores_libres()
         if len(surtidores_libres):
-            camion.set_tiempo_espera(reloj_simulacion.valor-camion.llegada)
+            #camion.set_tiempo_espera(reloj_simulacion.valor-camion.llegada)
+            print("Tiempo de espera")
+            print(camion.espera)
             surtidor = surtidores_libres[0] 
             tiempo_atencion_surtidor = surtidor.tiempo_atencion()
             evento.asignar_surtidor(surtidor)
             surtidor.set_disponible(False)
-            print("ATENCION SURTIDOR-----")
-            print(tiempo_atencion_surtidor)
             remover_evento_fel(fel, evento)
             avanzar=0
             generar_evento_fin_atencion(fel, reloj_simulacion.valor + tiempo_atencion_surtidor, surtidor, camion)
@@ -121,19 +131,13 @@ SALIDA_CAMION = 4
 promedio_total_experimentos = []
 tiempo_promedio_espera = 0
 
-
-estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS_LABORABLES,CANTIDAD_SURTIDORES)
-
-
-cola_camiones = []
-bandera = 0 #1 significa reiniciar
-corte = True
-
 for experimento in range(MAX_EXPERIMENTOS):
     duracion_experimento = 0
     for corrida in range(MAX_CORRIDAS):
         FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
         reloj_simulacion = Reloj()
+        estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS_LABORABLES,CANTIDAD_SURTIDORES)
+        cola_camiones = []
         indice_fel=0
         for evento in FEL:
             print(evento)

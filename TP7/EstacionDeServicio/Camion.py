@@ -16,4 +16,7 @@ class Camion:
     
     def set_tiempo_espera(self, espera):
         self.espera = espera
+
+    def get_tiempo_espera(self):
+        return self.espera
     
