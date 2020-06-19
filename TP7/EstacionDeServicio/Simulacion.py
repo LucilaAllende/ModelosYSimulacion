@@ -142,7 +142,6 @@ for experimento in range(MAX_EXPERIMENTOS):
             #procesar el evento actual
             procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, cola_camiones)
 
-
             indice_fel+=1
             if indice_fel<=len(FEL):
                 if len(FEL)>0:
