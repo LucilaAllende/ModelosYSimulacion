@@ -8,7 +8,6 @@ class EstacionDeServicio:
         
         self.surtidores = []
         for i in range(cantidad_surtidores):
-            print(i)
             self.surtidores.append(Surtidor(horas_simulacion, i+1))
 
         self.cantidad_camiones_atendidos=0

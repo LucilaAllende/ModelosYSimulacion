@@ -10,10 +10,13 @@ from Reloj import Reloj
 from Evento import Evento
 from Camion import Camion
 
+def calcular_intervalo_confianza(coficienteZ, media, error):
+    margenError = coficienteZ * error
+    return media - margenError, media + margenError
+
 def llegada_camiones():
     cantidad = randint(3,5)
-    llegada = np.random.exponential(15, 1)
-    #print (llegada)
+    llegada = np.random.exponential(15, cantidad)
     return llegada
 
 def generar_eventos_llegada():
@@ -40,9 +43,7 @@ def generar_FEL(horas_simulacion):
     
     fel= sorted(fel)
     #sorted(fel, key=lambda evento: evento.inicio)
-    print(len(fel))
-    #for evento in fel:
-        #print(evento)
+
     return fel
 
 def remover_evento_fel(fel,evento):
@@ -60,35 +61,21 @@ def tomar_proximo_evento(fel, evento):
     else:
         return None
 
-def incrementar_tiempo_espera(tiempo,cola):  
-    for camion in cola:
-        camion.set_tiempo_espera(tiempo-camion.get_tiempo_llegada())
-
-def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
+def procesar_evento(evento, reloj_simulacion, estacion, fel):
     avanzar=0
-    if evento.get_camion():
-        camion_cola = evento.get_camion()
-        if not camion_cola in cola:
-            incrementar_tiempo_espera(reloj_simulacion.valor, cola)
+    tiempo_espera_camion=0
     
     if evento.tipo == LLEGADA_CAMION :
-        print("Soy llegada. Reloj:")
-        print(reloj_simulacion.valor)
-
         #si es un evento reprocesado
         if evento.get_camion():
             camion = evento.get_camion()
-            print("Ya fui procesado")
         else:
             camion = Camion(reloj_simulacion.valor, 0, 0)
             evento.asignar_camion(camion)
-            print("CAMION CREADO")
 
         surtidores_libres = estacion.verificar_surtidores_libres()
+        
         if len(surtidores_libres):
-            #camion.set_tiempo_espera(reloj_simulacion.valor-camion.llegada)
-            print("Tiempo de espera")
-            print(camion.espera)
             surtidor = surtidores_libres[0] 
             tiempo_atencion_surtidor = surtidor.tiempo_atencion()
             evento.asignar_surtidor(surtidor)
@@ -97,21 +84,19 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, cola):
             avanzar=0
             generar_evento_fin_atencion(fel, reloj_simulacion.valor + tiempo_atencion_surtidor, surtidor, camion)
         else:
-            print("NO hay s libres")
-            cola.append(camion)
+            #reiniciamos la fel
             avanzar=1
 
     elif evento.tipo == FIN_ATENCION_CAMION :
-        print("SOy fin. Reloj")
-        print(reloj_simulacion.valor)
-        quitar_camion_cola(cola, evento.get_camion())
         estacion.cantidad_camiones_atendidos+=1
         surtidor = evento.get_surtidor()
         surtidor.set_disponible(True)        
         remover_evento_fel(fel, evento)
-        print("BOrre un evento")
+        tiempo_espera_camion = reloj_simulacion.valor - evento.get_camion().get_tiempo_llegada()
+        tiempo_espera_camion = evento.get_camion().set_tiempo_espera(tiempo_espera_camion)
+        tiempo_espera_camion = evento.get_camion().get_tiempo_espera()
     
-    return avanzar 
+    return avanzar, tiempo_espera_camion 
 
 #constantes
 MAX_EXPERIMENTOS=1
@@ -128,8 +113,9 @@ FIN_ATENCION_CAMION = 3
 SALIDA_CAMION = 4
 
 #variables
-promedio_total_experimentos = []
-tiempo_promedio_espera = 0
+tiempo_promedio_total = 0
+tiempo_promedio_espera_total = []
+promedio_corrida = 0
 
 for experimento in range(MAX_EXPERIMENTOS):
     duracion_experimento = 0
@@ -137,21 +123,19 @@ for experimento in range(MAX_EXPERIMENTOS):
         FEL=generar_FEL(CANTIDAD_HORAS_LABORABLES)
         reloj_simulacion = Reloj()
         estacion_de_servicio = EstacionDeServicio(CANTIDAD_HORAS_LABORABLES,CANTIDAD_SURTIDORES)
-        cola_camiones = []
+        tiempos_promedio_corrida = []
         indice_fel=0
-        for evento in FEL:
-            print(evento)
+
         while len(FEL)>0:
             evento_actual = FEL[indice_fel]
             cantidad_eventos = len(FEL)
-            print(cantidad_eventos)
-            for evento in FEL:
-                print(evento)
+
             #avanzo el reloj al tiempo del evento actual
             reloj_simulacion.avanzar(evento_actual.inicio)
         
             #procesar el evento actual
-            avanzar = procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, cola_camiones)
+            avanzar, tiempo_espera_camion = procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL)
+            tiempos_promedio_corrida.append(tiempo_espera_camion)
 
             if avanzar==0:
                 indice_fel=0
@@ -163,3 +147,24 @@ for experimento in range(MAX_EXPERIMENTOS):
                     indice_fel = 0 
                 else:
                     break 
+
+    promedio_corrida = np.mean(tiempos_promedio_corrida)
+    tiempo_promedio_espera_total.append(promedio_corrida)
+
+
+tiempo_promedio_total = np.mean(tiempo_promedio_espera_total)
+
+n = len(tiempo_promedio_espera_total)
+media = tiempo_promedio_total
+desvio = np.std(tiempo_promedio_espera_total)*3
+error = (desvio/(math.sqrt(n)))
+coficienteZ = 2.575
+
+extremoInferior, extremoSuperior = calcular_intervalo_confianza(coficienteZ, media, error)
+
+print(f"El tiempo promedio de finalizacion del proyecto es de {media}")
+print(f"El intervalo de confianza va de {extremoInferior} a {extremoSuperior}] con el 99% de confiabilidad")
+
+sns_plot = sns.distplot(tiempos_promedio_corrida)
+fig = sns_plot.get_figure()
+fig.savefig("Exponencial.png")
