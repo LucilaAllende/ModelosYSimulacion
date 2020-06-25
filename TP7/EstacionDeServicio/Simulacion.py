@@ -22,7 +22,7 @@ def llegada_camiones():
 def generar_eventos_llegada():
     eventos = []
     for i in llegada_camiones():
-        evento = Evento(LLEGADA_CAMION, i, None, None)
+        evento = Evento(LLEGADA_CAMION, int(i), None, None)
         eventos.append(evento)
     return eventos
 
@@ -61,9 +61,8 @@ def tomar_proximo_evento(fel, evento):
     else:
         return None
 
-def procesar_evento(evento, reloj_simulacion, estacion, fel):
+def procesar_evento(evento, reloj_simulacion, estacion, fel, tiempos_promedio_corrida):
     avanzar=0
-    tiempo_espera_camion=0
     
     if evento.tipo == LLEGADA_CAMION :
         #si es un evento reprocesado
@@ -76,6 +75,7 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel):
         surtidores_libres = estacion.verificar_surtidores_libres()
         
         if len(surtidores_libres):
+
             surtidor = surtidores_libres[0] 
             tiempo_atencion_surtidor = surtidor.tiempo_atencion()
             evento.asignar_surtidor(surtidor)
@@ -83,6 +83,13 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel):
             remover_evento_fel(fel, evento)
             avanzar=0
             generar_evento_fin_atencion(fel, reloj_simulacion.valor + tiempo_atencion_surtidor, surtidor, camion)
+            #tomo el tiempo del evento de salida
+            if (reloj_simulacion.get_valor_acumulado() > reloj_simulacion.valor):
+                tiempo_espera_camion = reloj_simulacion.get_valor_acumulado() - evento.get_camion().get_tiempo_llegada()
+            else:
+                tiempo_espera_camion = 0
+            evento.get_camion().set_tiempo_espera(tiempo_espera_camion)
+            tiempos_promedio_corrida.append(tiempo_espera_camion)
         else:
             #reiniciamos la fel
             avanzar=1
@@ -92,17 +99,14 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel):
         surtidor = evento.get_surtidor()
         surtidor.set_disponible(True)        
         remover_evento_fel(fel, evento)
-        tiempo_espera_camion = reloj_simulacion.valor - evento.get_camion().get_tiempo_llegada()
-        tiempo_espera_camion = evento.get_camion().set_tiempo_espera(tiempo_espera_camion)
-        tiempo_espera_camion = evento.get_camion().get_tiempo_espera()
-    
-    return avanzar, tiempo_espera_camion 
+        reloj_simulacion.acumular(reloj_simulacion.valor)   
+    return avanzar
 
 #constantes
-MAX_EXPERIMENTOS=1
-MAX_CORRIDAS=1
+MAX_EXPERIMENTOS=60
+MAX_CORRIDAS=100
 
-CANTIDAD_HORAS_LABORABLES=10
+CANTIDAD_HORAS_LABORABLES=24
 CANTIDAD_MINUTOS_LABORABLES = (CANTIDAD_HORAS_LABORABLES*60) #24 hs * 60 minutos laborables
 CANTIDAD_SURTIDORES=4
 
@@ -129,13 +133,13 @@ for experimento in range(MAX_EXPERIMENTOS):
         while len(FEL)>0:
             evento_actual = FEL[indice_fel]
             cantidad_eventos = len(FEL)
+            #print(len(FEL))
 
             #avanzo el reloj al tiempo del evento actual
             reloj_simulacion.avanzar(evento_actual.inicio)
         
             #procesar el evento actual
-            avanzar, tiempo_espera_camion = procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL)
-            tiempos_promedio_corrida.append(tiempo_espera_camion)
+            avanzar = procesar_evento(evento_actual, reloj_simulacion, estacion_de_servicio, FEL, tiempos_promedio_corrida)
 
             if avanzar==0:
                 indice_fel=0
@@ -147,10 +151,9 @@ for experimento in range(MAX_EXPERIMENTOS):
                     indice_fel = 0 
                 else:
                     break 
-
+                    
     promedio_corrida = np.mean(tiempos_promedio_corrida)
     tiempo_promedio_espera_total.append(promedio_corrida)
-
 
 tiempo_promedio_total = np.mean(tiempo_promedio_espera_total)
 
@@ -162,9 +165,9 @@ coficienteZ = 2.575
 
 extremoInferior, extremoSuperior = calcular_intervalo_confianza(coficienteZ, media, error)
 
-print(f"El tiempo promedio de finalizacion del proyecto es de {media}")
+print(f"El tiempo promedio de espera de los camiones es de {media}")
 print(f"El intervalo de confianza va de {extremoInferior} a {extremoSuperior}] con el 99% de confiabilidad")
 
-sns_plot = sns.distplot(tiempos_promedio_corrida)
+sns_plot = sns.distplot(tiempo_promedio_espera_total)
 fig = sns_plot.get_figure()
-fig.savefig("Exponencial.png")
+fig.savefig("Exponencial.png") 
