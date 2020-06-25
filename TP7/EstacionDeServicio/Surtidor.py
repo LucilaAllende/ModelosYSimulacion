@@ -5,10 +5,11 @@ class Surtidor:
     Clase que representa al surtidor
     """
     
-    def __init__(self, horas, empleado):
+    def __init__(self, horas, empleado, ocupacion):
         self.disponible = True
         self.horas = horas
         self.empleado = empleado
+        self.ocupacion = ocupacion
 
     def estoy_libre(self):
         return self.disponible
@@ -29,6 +30,9 @@ class Surtidor:
             tiempo_atencion=int(np.random.normal(18, 3, 1))
         
         return tiempo_atencion
+
+    def set_ocupacion(self, tiempo):
+        self.ocupacion = self.ocupacion + tiempo
 
     def __str__(self):
         return "Tiempo de atencion:{0}".format(self.empleado)
