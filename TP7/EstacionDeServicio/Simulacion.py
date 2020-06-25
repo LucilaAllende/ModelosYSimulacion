@@ -16,7 +16,7 @@ def calcular_intervalo_confianza(coficienteZ, media, error):
 
 def llegada_camiones():
     cantidad = randint(3,5)
-    llegada = np.random.exponential(15, 1)
+    llegada = np.random.exponential(15, cantidad)
     return llegada
 
 def generar_eventos_llegada():
