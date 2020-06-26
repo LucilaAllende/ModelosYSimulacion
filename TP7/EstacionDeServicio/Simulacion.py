@@ -65,9 +65,7 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, tiempos_promedio_co
     avanzar=0
     
     if evento.tipo == LLEGADA_CAMION :
-        #print("Soy llegada. Reloj")
-        #print(reloj_simulacion.valor)
-
+        
         #si es un evento reprocesado
         if evento.get_camion():
             camion = evento.get_camion()
@@ -93,21 +91,14 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, tiempos_promedio_co
             else:
                 tiempo_espera_camion = 0
             
-            #print("Me esta atendiendo el surtidor")
-            #print(surtidor.empleado)
-            #print(tiempo_atencion_surtidor)
             surtidor.set_ocupacion(tiempo_atencion_surtidor)
             evento.get_camion().set_tiempo_espera(tiempo_espera_camion)
             tiempos_promedio_corrida.append(tiempo_espera_camion)
         else:
-            #print("no hay libres. Reloj")
-            #print(reloj_simulacion.valor)
             #reiniciamos la fel
             avanzar=1
 
     elif evento.tipo == FIN_ATENCION_CAMION :
-        #print("Soy sallida. Reloj")
-        #print(reloj_simulacion.valor)
         estacion.cantidad_camiones_atendidos+=1
         surtidor = evento.get_surtidor()
         surtidor.set_disponible(True)        
@@ -116,7 +107,10 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, tiempos_promedio_co
     return avanzar
 
 def calcular_porcentaje(ocupacion):
-    return (ocupacion*100)/(MAX_CORRIDAS*MAX_EXPERIMENTOS)
+	tiempo_simulado = MAX_CORRIDAS * MAX_EXPERIMENTOS * CANTIDAD_MINUTOS_LABORABLES
+	porcentaje = (ocupacion / tiempo_simulado) * 100
+	return np.round(porcentaje, 2) #para dejarle 2 decimales
+
 
 #constantes
 MAX_EXPERIMENTOS=60
@@ -156,9 +150,6 @@ for experimento in range(MAX_EXPERIMENTOS):
             evento_actual = FEL[indice_fel]
             cantidad_eventos = len(FEL)
 
-            #for evento in FEL:
-                #print(evento)
-
             #avanzo el reloj al tiempo del evento actual
             reloj_simulacion.avanzar(evento_actual.inicio)
         
@@ -179,13 +170,13 @@ for experimento in range(MAX_EXPERIMENTOS):
         surtidores = estacion_de_servicio.get_surtidores()
         for surtidor in surtidores:
             if surtidor.empleado == 1:
-                ocupacion_surtidor1 += surtidor.ocupacion/CANTIDAD_HORAS_LABORABLES
+                ocupacion_surtidor1 += surtidor.ocupacion
             elif surtidor.empleado == 2:
-                ocupacion_surtidor2 += surtidor.ocupacion/CANTIDAD_HORAS_LABORABLES
+                ocupacion_surtidor2 += surtidor.ocupacion
             elif surtidor.empleado == 3:
-                ocupacion_surtidor3 += surtidor.ocupacion/CANTIDAD_HORAS_LABORABLES
+                ocupacion_surtidor3 += surtidor.ocupacion
             else:
-                ocupacion_surtidor4 += surtidor.ocupacion/CANTIDAD_HORAS_LABORABLES
+                ocupacion_surtidor4 += surtidor.ocupacion
 
     promedio_corrida = np.mean(tiempos_promedio_corrida)
     tiempo_promedio_espera_total.append(promedio_corrida)
@@ -210,11 +201,11 @@ print(f"El tiempo promedio de espera de los camiones es de {media}")
 print(f"El intervalo de confianza va de {extremoInferior} a {extremoSuperior}] con el 99% de confiabilidad")
 
 
-print(f"Porcentaje de ocupacion del surtidor 1: {ocupacion_surtidor1}%")
-print(f"Porcentaje de ocupacion del surtidor 2: {ocupacion_surtidor2}%")
-print(f"Porcentaje de ocupacion del surtidor 3: {ocupacion_surtidor3}%")
-print(f"Porcentaje de ocupacion del surtidor 4: {ocupacion_surtidor4}%")
+print(f"Porcentaje de ocupacion del surtidor 1: {porcentanje_1}%")
+print(f"Porcentaje de ocupacion del surtidor 2: {porcentanje_2}%")
+print(f"Porcentaje de ocupacion del surtidor 3: {porcentanje_3}%")
+print(f"Porcentaje de ocupacion del surtidor 4: {porcentanje_4}%")
 
-""" sns_plot = sns.distplot(tiempo_promedio_espera_total, kde=False)
+sns_plot = sns.distplot(tiempo_promedio_espera_total)
 fig = sns_plot.get_figure()
-fig.savefig("Exponencial.png")  """
+fig.savefig("Exponencial.png")
