@@ -10,11 +10,13 @@ from Reloj import Reloj
 from Evento import Evento
 from Camion import Camion
 
+'''Para calcular el intervalo de confianza'''
 def calcular_intervalo_confianza(coficienteZ, media, error):
     margenError = coficienteZ * error
     return media - margenError, media + margenError
 
 def llegada_camiones():
+    #Como cada camion llega aprox cada 15 min, en una hora pueden llegar entre 3 y 5 camiones. 
     cantidad = randint(3,5)
     llegada = np.random.exponential(15, cantidad)
     return llegada
