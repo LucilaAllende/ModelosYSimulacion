@@ -24,6 +24,8 @@ class Caja:
             tiempo_atencion=int(np.random.normal(15,3,1))
         elif self.empleado == 2:
             tiempo_atencion=int(np.random.exponential(scale=12,size=1))
+        else:
+            tiempo_atencion=int(np.random.normal(14,6,1))
         
         return tiempo_atencion
 

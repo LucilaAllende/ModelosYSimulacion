@@ -131,7 +131,7 @@ MAX_CORRIDAS=365
 
 CANTIDAD_HORAS_LABORABLES=12
 CANTIDAD_MINUTOS_LABORABLES = (CANTIDAD_HORAS_LABORABLES*60) #12 hs * 60 minutos laborables
-CANTIDAD_CAJAS=2
+CANTIDAD_CAJAS=3
 
 #eventos
 LLEGADA_CLIENTE = 1
@@ -148,6 +148,7 @@ promedio_corrida = 0
 #variables para calcular el % de ocupacion
 ocupacion_caja1=0
 ocupacion_caja2=0
+ocupacion_caja3=0
 
 
 for experimento in range(MAX_EXPERIMENTOS):
@@ -186,6 +187,8 @@ for experimento in range(MAX_EXPERIMENTOS):
                 ocupacion_caja1 += caja.ocupacion
             elif caja.empleado == 2:
                 ocupacion_caja2 += caja.ocupacion
+            else:
+                ocupacion_caja3+= caja.ocupacion
 
     promedio_corrida = np.mean(tiempos_promedio_corrida)
     tiempo_promedio_espera_total.append(promedio_corrida)
@@ -197,6 +200,7 @@ tiempo_promedio_total = np.mean(tiempo_promedio_espera_total)
 
 porcentanje_1 = calcular_porcentaje(ocupacion_caja1)
 porcentanje_2 = calcular_porcentaje(ocupacion_caja2)
+porcentanje_3 = calcular_porcentaje(ocupacion_caja3)
 
 n = len(tiempo_promedio_espera_total)
 media = tiempo_promedio_total
@@ -213,6 +217,7 @@ print(f"El intervalo de confianza va de {extremoInferior} a {extremoSuperior} co
 
 print(f"Porcentaje de ocupacion del caja 1: {porcentanje_1}%")
 print(f"Porcentaje de ocupacion del caja 2: {porcentanje_2}%")
+print(f"Porcentaje de ocupacion del caja 3: {porcentanje_3}%")
 
 sns_plot = sns.distplot(tiempo_promedio_espera_total)
 fig = sns_plot.get_figure()
