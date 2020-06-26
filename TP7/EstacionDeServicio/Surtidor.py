@@ -26,8 +26,10 @@ class Surtidor:
             tiempo_atencion=int(np.random.exponential(scale=15,size=1))
         elif self.empleado == 3:
             tiempo_atencion=int(np.random.exponential(scale=16, size=1))
-        else:
+        elif self.empleado == 4:
             tiempo_atencion=int(np.random.normal(18, 3, 1))
+        else:
+            tiempo_atencion=int(np.random.normal(19, 5, 1))
         
         return tiempo_atencion
 

@@ -65,7 +65,7 @@ def procesar_evento(evento, reloj_simulacion, estacion, fel, tiempos_promedio_co
     avanzar=0
     
     if evento.tipo == LLEGADA_CAMION :
-        
+
         #si es un evento reprocesado
         if evento.get_camion():
             camion = evento.get_camion()
@@ -118,7 +118,7 @@ MAX_CORRIDAS=100
 
 CANTIDAD_HORAS_LABORABLES=24
 CANTIDAD_MINUTOS_LABORABLES = (CANTIDAD_HORAS_LABORABLES*60) #24 hs * 60 minutos laborables
-CANTIDAD_SURTIDORES=4
+CANTIDAD_SURTIDORES=5
 
 #eventos
 LLEGADA_CAMION = 1
@@ -131,11 +131,12 @@ tiempo_promedio_total = 0
 tiempo_promedio_espera_total = []
 promedio_corrida = 0
 
-
+#variables para calcular el % de ocupacion
 ocupacion_surtidor1=0
 ocupacion_surtidor2=0
 ocupacion_surtidor3=0
 ocupacion_surtidor4=0
+ocupacion_surtidor5=0
 
 for experimento in range(MAX_EXPERIMENTOS):
     duracion_experimento = 0
@@ -175,8 +176,10 @@ for experimento in range(MAX_EXPERIMENTOS):
                 ocupacion_surtidor2 += surtidor.ocupacion
             elif surtidor.empleado == 3:
                 ocupacion_surtidor3 += surtidor.ocupacion
-            else:
+            elif surtidor.empleado == 4:
                 ocupacion_surtidor4 += surtidor.ocupacion
+            else:
+                ocupacion_surtidor5 += surtidor.ocupacion
 
     promedio_corrida = np.mean(tiempos_promedio_corrida)
     tiempo_promedio_espera_total.append(promedio_corrida)
@@ -188,6 +191,7 @@ porcentanje_1 = calcular_porcentaje(ocupacion_surtidor1)
 porcentanje_2 = calcular_porcentaje(ocupacion_surtidor2)
 porcentanje_3 = calcular_porcentaje(ocupacion_surtidor3)
 porcentanje_4 = calcular_porcentaje(ocupacion_surtidor4)
+porcentanje_5 = calcular_porcentaje(ocupacion_surtidor5)
 
 n = len(tiempo_promedio_espera_total)
 media = tiempo_promedio_total
@@ -205,7 +209,8 @@ print(f"Porcentaje de ocupacion del surtidor 1: {porcentanje_1}%")
 print(f"Porcentaje de ocupacion del surtidor 2: {porcentanje_2}%")
 print(f"Porcentaje de ocupacion del surtidor 3: {porcentanje_3}%")
 print(f"Porcentaje de ocupacion del surtidor 4: {porcentanje_4}%")
+print(f"Porcentaje de ocupacion del surtidor 5: {porcentanje_5}%")
 
 sns_plot = sns.distplot(tiempo_promedio_espera_total)
 fig = sns_plot.get_figure()
-fig.savefig("Exponencial.png")
+fig.savefig("Exponencial5Surtidores.png")
